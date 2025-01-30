@@ -1,4 +1,5 @@
-﻿using WatchBin.Domain.Respositories;
+﻿using Microsoft.EntityFrameworkCore;
+using WatchBin.Domain.Respositories;
 using WatchBin.Infrastructure.Entity;
 
 namespace WatchBin.Infrastructure.Repositories
@@ -14,8 +15,22 @@ namespace WatchBin.Infrastructure.Repositories
 
         public async Task<MediaEntity> AddAsync(MediaEntity entity, string userId)
         {
-            entity.UserId = userId;
-            _context.Media.Add(entity);
+            var existingEntity = await _context.Media.FirstOrDefaultAsync(m =>
+                m.Id == entity.Id && m.UserId == userId
+            );
+
+            if (existingEntity != null)
+            {
+                // Update existing entity
+                _context.Entry(existingEntity).CurrentValues.SetValues(entity);
+            }
+            else
+            {
+                // Add new entity
+                entity.UserId = userId;
+                _context.Media.Add(entity);
+            }
+
             await _context.SaveChangesAsync();
             return entity;
         }
