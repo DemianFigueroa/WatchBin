@@ -10,16 +10,13 @@ namespace WatchBin.Mappers
             return new MediaViewModel()
             {
                 Id = model.Id,
+                UserId = model.UserId,
                 Name = model.Name,
                 Type = model.Type,
                 ReleaseDate = model.ReleaseDate,
                 CoverImage = model.CoverImage,
                 Category = model.Category,
-                AddedDate = model.AddedDate,
-                Priority = model.Priority,
                 Status = model.Status,
-                CompletionStatus = model.CompletionStatus,
-                Length = model.Length,
             };
         }
     }

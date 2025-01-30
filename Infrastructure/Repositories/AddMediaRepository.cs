@@ -1,5 +1,5 @@
-﻿using WatchBin.Infrastructure.Entity;
-using WatchBin.Domain.Respositories;
+﻿using WatchBin.Domain.Respositories;
+using WatchBin.Infrastructure.Entity;
 
 namespace WatchBin.Infrastructure.Repositories
 {
@@ -12,8 +12,9 @@ namespace WatchBin.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<MediaEntity> AddAsync(MediaEntity entity)
+        public async Task<MediaEntity> AddAsync(MediaEntity entity, string userId)
         {
+            entity.UserId = userId;
             _context.Media.Add(entity);
             await _context.SaveChangesAsync();
             return entity;

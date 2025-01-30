@@ -7,6 +7,4 @@ namespace WatchBin.Mappers
     {
         AddMediaRequestModel Map(AddMediaRequestViewModel source);
     }
-
-
 }

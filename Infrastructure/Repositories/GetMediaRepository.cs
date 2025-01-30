@@ -1,6 +1,7 @@
-﻿using WatchBin.Infrastructure.Entity;
+﻿using Microsoft.EntityFrameworkCore;
+using WatchBin.Domain.Repositories;
 using WatchBin.Domain.Respositories;
-using Microsoft.EntityFrameworkCore;
+using WatchBin.Infrastructure.Entity;
 
 namespace WatchBin.Infrastructure.Repositories
 {
@@ -13,28 +14,41 @@ namespace WatchBin.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<MediaEntity?> GetAsync(Guid id)
+        public async Task<MediaEntity?> GetAsync(Guid id, string userId)
         {
-            var entity = await _context.Media.FindAsync(id);
+            var entity = await _context.Media.FirstOrDefaultAsync(media =>
+                media.Id == id && media.UserId == userId
+            );
+
             if (entity == null)
             {
-                throw new Exception("Media entity not found.");
+                throw new Exception("Media entity not found or does not belong to the user.");
             }
+
             return entity;
         }
-        public async Task<List<MediaEntity>> GetAllAsync()
+
+        public async Task<List<MediaEntity>> GetAllAsync(string userId)
         {
-            return await _context.Media.ToListAsync();
+            return await _context.Media.Where(media => media.UserId == userId).ToListAsync();
         }
-        public async Task<MediaEntity> DeleteAsync(Guid id)
+
+        public async Task<MediaEntity> DeleteAsync(Guid id, string userId)
         {
-            var media = await _context.Media.FindAsync(id);
+            var media = await _context.Media.FirstOrDefaultAsync(media =>
+                media.Id == id && media.UserId == userId
+            );
+
             if (media != null)
             {
                 _context.Media.Remove(media);
                 await _context.SaveChangesAsync();
+                return media;
             }
-            throw new InvalidOperationException($"Media with ID {id} does not exist.");
+
+            throw new InvalidOperationException(
+                $"Media with ID {id} does not exist or does not belong to the user."
+            );
         }
     }
 }

@@ -9,25 +9,17 @@ namespace WatchBin.Mappers
         {
             return new AddMediaRequestModel()
             {
+                Id = model.Id,
+                UserId = model.UserId,
                 Name = model.Name,
                 Type = model.Type,
                 Creator = model.Creator,
                 ReleaseDate = model.ReleaseDate,
-                Language = model.Language,
                 Description = model.Description,
                 CoverImage = model.CoverImage,
-                Notes = model.Notes,
                 Category = model.Category,
-                AddedDate = model.AddedDate,
-                Priority = model.Priority,
                 Status = model.Status,
-                CompletionStatus = model.CompletionStatus,
-                Platform = model.Platform,
-                Length = model.Length,
-                IMBDCode = model.IMBDCode
             };
         }
-
-
     }
 }

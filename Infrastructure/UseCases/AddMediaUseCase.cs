@@ -1,7 +1,7 @@
 using WatchBin.Domain.Models;
-using WatchBin.Mappers;
 using WatchBin.Domain.Respositories;
 using WatchBin.Domain.UseCases;
+using WatchBin.Mappers;
 
 namespace WatchBin.Infrastructure.UseCases
 {
@@ -13,10 +13,11 @@ namespace WatchBin.Infrastructure.UseCases
         private readonly IMediaEntityToModelMapper entityToModelMapper;
 
         public AddMediaUseCase(
-            IAddMediaRepository addRepository, 
+            IAddMediaRepository addRepository,
             IGetMediaRepository getMediaRepository,
             IMediaModelToEntityMapper modelToEntityMapper,
-            IMediaEntityToModelMapper entityToModelMapper)
+            IMediaEntityToModelMapper entityToModelMapper
+        )
         {
             this.addRepository = addRepository;
             this.getMediaRepository = getMediaRepository;
@@ -24,11 +25,12 @@ namespace WatchBin.Infrastructure.UseCases
             this.entityToModelMapper = entityToModelMapper;
         }
 
-        public async Task<MediaModel> AddAsync(AddMediaRequestModel request)
+        public async Task<MediaModel> AddAsync(AddMediaRequestModel request, string userId)
         {
             var mediaEntity = modelToEntityMapper.Map(request);
-            var addedEntity = await addRepository.AddAsync(mediaEntity);
-            var retrievedEntity = await getMediaRepository.GetAsync(addedEntity.Id);
+            mediaEntity.UserId = userId;
+            var addedEntity = await addRepository.AddAsync(mediaEntity, userId);
+            var retrievedEntity = await getMediaRepository.GetAsync(addedEntity.Id, userId);
             if (retrievedEntity == null)
             {
                 throw new Exception("Failed to retrieve the added media entity.");

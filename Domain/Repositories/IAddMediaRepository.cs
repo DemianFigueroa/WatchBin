@@ -4,7 +4,6 @@ namespace WatchBin.Domain.Respositories
 {
     public interface IAddMediaRepository
     {
-        Task<MediaEntity> AddAsync(MediaEntity entity);
+        Task<MediaEntity> AddAsync(MediaEntity entity, string userId);
     }
-
 }

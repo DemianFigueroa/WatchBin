@@ -5,7 +5,7 @@ namespace WatchBin.Domain.UseCases
 {
     public interface IGetMediaUseCase
     {
-        Task<MediaModel> GetAsync(GetMediaRequestModel request);
-        Task<List<MediaViewModel>> GetAllAsync();
+        Task<MediaModel> GetAsync(GetMediaRequestModel request, string userId);
+        Task<List<MediaViewModel>> GetAllAsync(string userId);
     }
 }

@@ -1,5 +1,5 @@
-using WatchBin.Infrastructure.Entity;
 using WatchBin.Domain.Models;
+using WatchBin.Infrastructure.Entity;
 
 namespace WatchBin.Mappers
 {

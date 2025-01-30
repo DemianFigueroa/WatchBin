@@ -1,8 +1,8 @@
 using WatchBin.Domain.Models;
 using WatchBin.Domain.Repositories;
+using WatchBin.Domain.Respositories;
 using WatchBin.Domain.UseCases;
 using WatchBin.Mappers;
-using WatchBin.Domain.Respositories;
 
 namespace WatchBin.Infrastructure.UseCases
 {
@@ -15,21 +15,22 @@ namespace WatchBin.Infrastructure.UseCases
         public DeleteMediaUseCase(
             IGetMediaRepository getMediaRepository,
             IDeleteMediaRepository deleteRepository,
-            IMediaEntityToModelMapper entityToModelMapper)
+            IMediaEntityToModelMapper entityToModelMapper
+        )
         {
             this.getMediaRepository = getMediaRepository;
             this.deleteRepository = deleteRepository;
             this.entityToModelMapper = entityToModelMapper;
         }
 
-        public async Task<MediaModel> DeleteAsync(Guid MediaId)
+        public async Task<MediaModel> DeleteAsync(Guid MediaId, string userId)
         {
-            var retrievedEntity = await getMediaRepository.GetAsync(MediaId);
+            var retrievedEntity = await getMediaRepository.GetAsync(MediaId, userId);
             if (retrievedEntity == null)
             {
-                throw new Exception("Media not found.");
+                throw new Exception("Media not found or you do not have permission to delete it.");
             }
-            await deleteRepository.DeleteAsync(MediaId);
+            await deleteRepository.DeleteAsync(MediaId, userId);
             return entityToModelMapper.Map(retrievedEntity);
         }
     }

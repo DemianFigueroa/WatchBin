@@ -14,25 +14,19 @@ namespace WatchBin.Mappers
             }
             return new MediaModel
             {
+                UserId = model.UserId,
                 Id = model.Id,
                 Name = model.Name,
                 Type = model.Type,
                 Creator = model.Creator,
                 ReleaseDate = model.ReleaseDate,
-                Language = model.Language,
                 Description = model.Description,
                 CoverImage = model.CoverImage,
-                Notes = model.Notes,
                 Category = model.Category,
-                AddedDate = model.AddedDate,
-                Priority = model.Priority,
                 Status = model.Status,
-                CompletionStatus = model.CompletionStatus,
-                Platform = model.Platform,
-                Length = model.Length,
-                IMBDCode = model.IMBDCode
             };
         }
+
         public MediaViewModel MapToViewModel(MediaEntity model)
         {
             if (model == null)
@@ -41,19 +35,15 @@ namespace WatchBin.Mappers
             }
             return new MediaViewModel
             {
+                UserId = model.UserId,
                 Id = model.Id,
                 Name = model.Name,
                 Type = model.Type,
                 ReleaseDate = model.ReleaseDate,
                 CoverImage = model.CoverImage,
                 Category = model.Category,
-                AddedDate = model.AddedDate,
-                Priority = model.Priority,
                 Status = model.Status,
-                CompletionStatus = model.CompletionStatus,
-                Length = model.Length,
             };
         }
     }
-    
 }
