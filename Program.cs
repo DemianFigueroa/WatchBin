@@ -71,7 +71,7 @@ builder.Services.AddScoped<
 >();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
-// Add CORS policy (before adding middleware)
+// Add CORS policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(
@@ -79,7 +79,7 @@ builder.Services.AddCors(options =>
         builder =>
         {
             builder
-                .WithOrigins("http://localhost:4200") // Angular app URL
+                .WithOrigins("http://localhost:4200") // Angular URL
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials();
@@ -141,14 +141,13 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// Apply CORS middleware before Authentication and Authorization
 app.UseCors("AllowLocalhost");
 
 // Ensure database is created
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    dbContext.Database.EnsureCreated(); // Creates the database if it does not exist
+    dbContext.Database.EnsureCreated();
 }
 
 // Configure the HTTP request pipeline
@@ -169,15 +168,11 @@ else
 
 app.UseHttpsRedirection();
 
-// Authentication and Authorization should come after UseCors
-
-
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Map controllers
 app.MapControllers();
 
 app.Run();

@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -37,18 +36,23 @@ namespace WatchBin.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
             var user = await _userManager.Users.FirstOrDefaultAsync(x =>
                 x.UserName == loginDto.Username.ToLower()
             );
+
             if (user == null)
                 return Unauthorized(new { message = "This username does not exist" });
-            var resut = await _signInManager.CheckPasswordSignInAsync(
+
+            var result = await _signInManager.CheckPasswordSignInAsync(
                 user,
                 loginDto.Password,
                 false
             );
-            if (!resut.Succeeded)
+
+            if (!result.Succeeded)
                 return Unauthorized(new { message = "Invalid username and/or password" });
+
             return Ok(
                 new NewUserDto
                 {
@@ -64,49 +68,45 @@ namespace WatchBin.Controllers
         {
             try
             {
-                // Check for validation errors in the model state
                 if (!ModelState.IsValid)
                 {
-                    // Collect validation errors and return them in a consistent format
                     var errors = string.Join(
                         ", ",
                         ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
                     );
                     return Unauthorized(new { message = $"Validation failed: {errors}" });
                 }
-
-                // Check if the username already exists (if needed)
+                if (string.IsNullOrEmpty(registerDto.Username))
+                {
+                    return Unauthorized(new { message = "Username cannot be null or empty" });
+                }
                 var existingUser = await _userManager.FindByNameAsync(registerDto.Username);
                 if (existingUser != null)
                 {
                     return Unauthorized(new { message = "This username already exists." });
                 }
 
-                // Create new user object
                 var appUser = new AppUser
                 {
                     UserName = registerDto.Username,
                     Email = registerDto.Email,
                 };
 
-                // Validate password is not empty
                 if (string.IsNullOrEmpty(registerDto.Password))
                 {
                     return Unauthorized(new { message = "Password cannot be null or empty" });
                 }
 
-                // Create user
                 var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
                 if (createdUser.Succeeded)
                 {
-                    var userId = appUser.Email;
-                    var templateMedia = MediaTemplate.GetDefaultMedia(userId); // Get default media
+                    var userId = appUser.Id; // Use Id instead of Email
+                    var templateMedia = MediaTemplate.GetDefaultMedia(userId); // Pass Id
                     foreach (var media in templateMedia)
                     {
-                        await _mediaService.AddAsync(media, userId); // Add each media item
+                        await _mediaService.AddAsync(media, userId); // Pass Id
                     }
 
-                    // Assign role to user
                     var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
                     if (roleResult.Succeeded)
                     {
@@ -126,7 +126,6 @@ namespace WatchBin.Controllers
                 }
                 else
                 {
-                    // Return the errors that occurred during user creation
                     var errors = string.Join(", ", createdUser.Errors.Select(e => e.Description));
                     return Unauthorized(new { message = $"Failed to create user: {errors}" });
                 }

@@ -65,7 +65,7 @@ namespace WatchBin.ViewModels
                 new AddMediaRequestViewModel
                 {
                     Name = "Black Adder",
-                    Type = "TV Show",
+                    Type = "Show",
                     Creator = "Richard Curtis, Rowan Atkinson",
                     ReleaseDate = new DateTime(1983, 6, 15),
                     Description =

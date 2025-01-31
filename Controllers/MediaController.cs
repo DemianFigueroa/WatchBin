@@ -1,11 +1,7 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using WatchBin.Domain.Repositories;
 using WatchBin.Domain.UseCases;
 using WatchBin.Services;
 using WatchBin.Users;
@@ -35,7 +31,7 @@ namespace WatchBin.Controllers
 
         private string? GetUserId()
         {
-            return User.FindFirst(ClaimTypes.Email)?.Value;
+            return User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
 
         [HttpGet("getAllMedia")]
@@ -47,7 +43,7 @@ namespace WatchBin.Controllers
                 return Unauthorized("id " + userId);
             }
 
-            var media = await _mediaService.GetAllAsync(userId); // Updated to filter by UserId
+            var media = await _mediaService.GetAllAsync(userId);
             return Ok(media);
         }
 
@@ -60,7 +56,7 @@ namespace WatchBin.Controllers
                 return Unauthorized("User not authenticated.");
             }
 
-            var request = new GetMediaByIdRequestViewModel { Id = id, UserId = userId }; // Include UserId
+            var request = new GetMediaByIdRequestViewModel { Id = id, UserId = userId };
             var media = await _mediaService.GetByIdAsync(request);
 
             if (media == null)
@@ -80,7 +76,7 @@ namespace WatchBin.Controllers
                 return Unauthorized("User not authenticated.");
             }
 
-            request.UserId = userId; // Include UserId
+            request.UserId = userId;
             var media = await _mediaService.AddAsync(request, userId);
             return Ok(media);
         }
@@ -96,7 +92,7 @@ namespace WatchBin.Controllers
 
             try
             {
-                var deletedMedia = await _deleteMediaUseCase.DeleteAsync(id, userId); // Include UserId
+                var deletedMedia = await _deleteMediaUseCase.DeleteAsync(id, userId);
                 return Ok(deletedMedia);
             }
             catch (Exception ex)
@@ -110,32 +106,28 @@ namespace WatchBin.Controllers
         {
             try
             {
-                // Get the current user's email from the claims
                 var userId = GetUserId();
                 if (string.IsNullOrEmpty(userId))
                 {
                     return Unauthorized(new { message = "User not authenticated." });
                 }
 
-                // Find the user by email
-                var user = await _userManager.FindByEmailAsync(userId);
+                var user = await _userManager.FindByIdAsync(userId);
                 if (user == null)
                 {
+                    Console.WriteLine($"Retrieved UserId from token: {userId}");
                     return NotFound(new { message = "User not found." });
                 }
 
-                // Get all media associated with the user
                 var allMedia = await _mediaService.GetAllAsync(userId);
                 if (allMedia != null)
                 {
-                    // Delete each media item
                     foreach (var media in allMedia)
                     {
                         await _deleteMediaUseCase.DeleteAsync(media.Id, userId);
                     }
                 }
 
-                // Delete the user
                 var result = await _userManager.DeleteAsync(user);
                 if (result.Succeeded)
                 {
@@ -148,7 +140,6 @@ namespace WatchBin.Controllers
                 }
                 else
                 {
-                    // Return the errors that occurred during deletion
                     var errors = string.Join(", ", result.Errors.Select(e => e.Description));
                     return BadRequest(new { message = $"Failed to delete user: {errors}" });
                 }

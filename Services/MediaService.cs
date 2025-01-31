@@ -54,7 +54,7 @@ namespace WatchBin.Services
         )
         {
             var model = await _context
-                .Media.Where(m => m.Id == request.Id && m.UserId == request.UserId) // Ensure UserId matches
+                .Media.Where(m => m.Id == request.Id && m.UserId == request.UserId)
                 .FirstOrDefaultAsync();
 
             if (model == null)
@@ -80,7 +80,7 @@ namespace WatchBin.Services
         public async Task<List<MediaViewModel>> GetAllAsync(string userId)
         {
             var media = await _context
-                .Media.Where(m => m.UserId == userId) // Filter by UserId
+                .Media.Where(m => m.UserId == userId)
                 .OrderBy(m => m.Name)
                 .ToListAsync();
 

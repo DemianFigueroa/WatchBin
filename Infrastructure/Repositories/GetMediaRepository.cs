@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WatchBin.Domain.Repositories;
 using WatchBin.Domain.Respositories;
 using WatchBin.Infrastructure.Entity;
 
