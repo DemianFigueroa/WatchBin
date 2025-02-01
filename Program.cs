@@ -88,11 +88,7 @@ builder.Services.AddCors(options =>
         "AllowLocalhost",
         builder =>
         {
-            builder
-                .WithOrigins("https://demianfigueroa.netlify.app")
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials();
+            builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials();
         }
     );
 });
