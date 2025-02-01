@@ -16,9 +16,16 @@ using WatchBin.Users;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure Services
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-);
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (connectionString == null)
+{
+    throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+}
+
+// Register ApplicationDbContext with PostgreSQL
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
+
+// Add Identity services
 builder
     .Services.AddIdentity<AppUser, IdentityRole>(options =>
     {
@@ -28,8 +35,10 @@ builder
         options.Password.RequireNonAlphanumeric = true;
         options.Password.RequiredLength = 12;
     })
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
+// Add JWT Authentication
 builder
     .Services.AddAuthentication(options =>
     {
@@ -59,6 +68,7 @@ builder
         };
     });
 
+// Register Services
 builder.Services.AddScoped<IMediaService, MediaService>();
 builder.Services.AddScoped<
     IAddMediaRequestViewModelToModelMapper,
@@ -95,11 +105,11 @@ builder.Services.AddScoped<IMediaEntityToModelMapper, MediaEntityToModelMapper>(
 builder.Services.AddScoped<IAddMediaUseCase, AddMediaUseCase>();
 builder.Services.AddScoped<IGetMediaUseCase, GetMediaUseCase>();
 builder.Services.AddScoped<IDeleteMediaUseCase, DeleteMediaUseCase>();
-builder.Services.AddScoped<IDeleteMediaRepository, DeleteMediaRepository>();
 
 // Repositories
 builder.Services.AddScoped<IAddMediaRepository, AddMediaRepository>();
 builder.Services.AddScoped<IGetMediaRepository, GetMediaRepository>();
+builder.Services.AddScoped<IDeleteMediaRepository, DeleteMediaRepository>();
 
 // Controllers
 builder.Services.AddControllers();
@@ -167,7 +177,6 @@ else
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();

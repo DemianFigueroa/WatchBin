@@ -19,7 +19,7 @@ namespace WatchBin.Mappers
                 Name = model.Name,
                 Type = model.Type,
                 Creator = model.Creator,
-                ReleaseDate = model.ReleaseDate,
+                ReleaseDate = model.ReleaseDate.ToUniversalTime(),
                 Description = model.Description,
                 CoverImage = model.CoverImage,
                 Category = model.Category,

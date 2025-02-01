@@ -38,7 +38,7 @@ namespace WatchBin.Controllers
                 return BadRequest(ModelState);
 
             var user = await _userManager.Users.FirstOrDefaultAsync(x =>
-                x.UserName == loginDto.Username.ToLower()
+                EF.Functions.Like(x.UserName, loginDto.Username)
             );
 
             if (user == null)
