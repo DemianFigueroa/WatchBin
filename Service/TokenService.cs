@@ -14,14 +14,13 @@ namespace WatchBin.TokenService
         public TokenService(IConfiguration config)
         {
             _config = config;
-            _key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(
-                    _config["JWT:SigningKey"]
-                        ?? throw new InvalidOperationException(
-                            "JWT:SigningKey is missing in configuration."
-                        )
-                )
-            );
+            var signingKey =
+                Environment.GetEnvironmentVariable("JWT_SIGNING_KEY")
+                ?? throw new InvalidOperationException(
+                    "JWT_SIGNING_KEY environment variable is missing."
+                );
+
+            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey));
         }
 
         public string CreateToken(AppUser user)

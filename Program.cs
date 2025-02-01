@@ -61,8 +61,11 @@ builder
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(
                 System.Text.Encoding.UTF8.GetBytes(
-                    builder.Configuration["JWT:SigningKey"]
-                        ?? throw new ArgumentNullException("JWT:SigningKey")
+                    Environment.GetEnvironmentVariable("JWT_SIGNING_KEY") // Read from environment variable
+                        ?? throw new ArgumentNullException(
+                            "JWT_SIGNING_KEY",
+                            "JWT Signing Key is missing in environment variables."
+                        )
                 )
             ),
         };
